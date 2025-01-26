@@ -1,0 +1,6 @@
+boletosavion.reiniciar
+boletosavion.Boletosavion
+boletosavion.Base
+boletosavion.consulta
+boletosavion.llenado
+boletosavion.registrar

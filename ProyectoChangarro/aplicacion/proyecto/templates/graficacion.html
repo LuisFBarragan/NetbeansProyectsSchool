@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    @media screen and (max-width: 600px) {
+    }
+    .card{
+        /*display:inline-block;*/
+    }
+    .card .card-image img{
+        height: 200px;
+    }
+    .card{
+        height: 80px;
+    }
+    #tabla {
+     overflow:scroll;
+     height:500px;
+     width:100%;
+}
+   
+
+</style>
+
+    <div class="container" id=cont>
+        <input   type="hidden" value="{{planta}}" id="plantita" ><br>
+        <br/>
+        <div class="row">
+            
+        <center><H3>Datos generados</H3></center>  
+        
+            <div class="container" id="tabla">
+                <br/>  
+  
+                <button class="btn btn-small blue descargar"><i class="material-icons">picture_as_pdf</i></button>
+          
+                <table class="highlight centered">
+                    <thead>
+                    <tr>
+                        <th>Arreglo1</th>
+                        <th>Arreglo2</th>
+                        
+                        
+                        
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for coco in arreglo1%}
+                            <tr>
+                                <td>{{ coco.0}}</td>
+                                <td>{{ coco.1}}</td>
+                                
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <br> <br> <br>
+            <div class="container">
+                <canvas id="conductividad"style="width:100px"  ></canvas>
+            </div>
+            
+            <div class="container">
+                 <canvas id="ph" style="width:100px" ></canvas>
+            </div>
+          
+           
+        </div>    
+    </div>
+    
+    
+    
+    
+{% endblock content %}
+
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<script type="text/javascript">
+
+	$(document).ready(function(){
+		$('.materialboxed').materialbox();
+	});
+
+    var ctx = document.getElementById('conductividad').getContext('2d');
+    var chart = new Chart(ctx, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: {{arregloa|safe}},
+            datasets: [{
+                label: 'distribución',
+                backgroundColor: 'blue',
+                borderColor: 'blue',
+                data: {{arreglob|safe}},
+                fill:false,
+            },
+      
+         
+            ]
+        },
+
+        // Configuration options go here
+        options: {
+            scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'arreglo1'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'arreglo2'
+						}
+					}]
+				}
+        }
+    });
+
+   
+   
+</script>
+<script>
+    $(document).on("click",".descargar",function(){
+        var doc=new jsPDF();
+        var img='/media/images/acceso.jpeg';
+        
+        doc.setFontSize(20);
+        doc.text(50,10, "Reporte del comportamiento de variables");
+        doc.text(90,20, "por especie ");
+        doc.addImage(img, 'JPEG', 5,5,35,25);
+       
+        let brand = "ORNADATA";
+        doc.setTextColor("#568c5a"); doc.setFontSize(18);
+        doc.text(brand, (210 / 2) +5,  35, 'center');
+        var nombreplanta= $('input[name="planta"]').text();
+        var nombreplnta= $('.cont input[name="plantita"] ').val()
+        doc.setFontSize(10);
+        doc.text((210 / 2) - 90,40, "Reporte del comportamiento de laplanta:  "+ nombreplnta);
+       // doc.autoTable({ startY: 50, html: '#tabla',  headStyles:{fillColor: [125, 125, 125],valign: 'middle', halign : 'center'},  bodyStyles:{valign: 'middle', halign : 'center'}, footStyles: {fillColor: [230, 230, 230], textColor: "green", valign: 'middle', halign : 'center'}, columnStyles: {0: {valign: 'left', halign : 'left' },} });
+        //canvas = document.querySelector('#tabla');
+        //canvasimg= canvas.toDataURL("image/PNG", 1.0);
+        //doc.addImage(canvasimg, 'png', (210 / 2) - 60, 155, 120,120);
+
+
+        canvas = document.querySelector('#conductividad');
+        canvasimg= canvas.toDataURL("image/PNG", 1.0);
+        doc.addImage(canvasimg, 'png', (210 / 2) - 90, 40, 160,100);
+
+        canvas = document.querySelector('#ph');
+        canvasimg= canvas.toDataURL("image/PNG", 1.0);
+        doc.addImage(canvasimg, 'png', (210 / 2) - 90, 155, 160,100);
+        var hoy =new Date();
+        var fecha=hoy.getDate()+'-'+(hoy.getMonth()+1)+'-'+hoy.getUTCFullYear();
+        doc.setFontSize(10);
+        doc.text((210 / 2) - 90,290, "Impreso el: "+ fecha);
+        doc.text((210 / 2) +10,290, "ORNACOL Todos los derechos reservados 2020 ");
+        doc.setProperties({
+            title: 'Reporte del comportamiento de variables fisico-químicas por especie',
+            subject: 'This is the subject',
+            author: 'Jhoel Velaszco',
+            keywords: 'PRODUCION',
+            creator: 'MEEE'
+        });
+
+
+doc.save('Reporte.pdf');
+});
+</script>
+
+{% endblock js %}
